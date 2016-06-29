@@ -5,9 +5,10 @@ import 'material-design-lite';
 import Vue from 'vue';
 import VueMdl from 'vue-mdl';
 import Particle from './module/particle';
+import Bullet from './module/Bullet';
 
 Vue.use(VueMdl);
-
+const d=10;
 document.addEventListener('DOMContentLoaded',() =>{
   const App=Vue.extend({
     created:function() {
@@ -19,19 +20,44 @@ document.addEventListener('DOMContentLoaded',() =>{
     },
     methods:{
       calc:function(particle){
+        /**
+         * このへんイラネ
+         */
         if(this.cursor.enable){
           const inRange=Math.hypot(particle.x-this.cursor.x,particle.y-this.cursor.y) < this.cursor.r;
           if(!particle.controlled){
             if(inRange){
-              particle.force(this.cursor.x, this.cursor.y);
+              particle.reflect(this.cursor.x, this.cursor.y);
               particle.controlled=true;
             }
           }else if(!inRange)particle.controlled=false;
         }
         particle.update(this.width, this.height);
+        if(particle.state==="death"){
+          this.particles.$remove(particle);
+        }
       },
       tick:function(){
         this.particles.forEach(this.calc, this);
+        switch (this.keyState) {
+          case "Left":
+            this.player.x-=d;
+            break;
+          case "Right":
+            this.player.x+=d;
+            break;
+          case "Up":
+            this.player.y-=d;
+            break;
+          case "Down":
+            this.player.y+=d;
+            break;
+          case "U+0058":
+            this.particles.push(new Bullet(this.player.x,this.player.y-this.player.r))
+            break;
+          default:
+            break;
+        }
         setTimeout(this.tick,30);
       },
       calcVelocity:function (particle) {
@@ -44,6 +70,10 @@ document.addEventListener('DOMContentLoaded',() =>{
         this.cursor.x=e.offsetX;
         this.cursor.y=e.offsetY;
         if(!this.cursor.enable)this.cursor.enable=true;
+      },
+      onKeydown: function (e) {
+        console.log(e.keyIdentifier);
+        this.keyState=e.keyIdentifier;
       }
     },
     data:() => {
@@ -51,13 +81,19 @@ document.addEventListener('DOMContentLoaded',() =>{
         cursor:{
           x:0,
           y:0,
-          r:100,
+          r:0,
           enable:false
+        },
+        player:{
+          x:400,
+          y:500,
+          r:5
         },
         width:800,
         height:600,
         particles:[
-        ]
+        ],
+        keyState:""
       }
     }
   });

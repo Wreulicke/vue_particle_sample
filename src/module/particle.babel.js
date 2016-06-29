@@ -1,30 +1,19 @@
 const v=10;
-function rand(s,e){
-  const range=e?e-s:s;
-  const offset=e?s:0;
-  return () => range*Math.random()+offset;
-}
-function toHex(code) {
-  return Math.floor(code).toString(16);
-}
+import random from "./util/random";
+import toHex from "./util/toHex";
+import {velocity,color} from "./util/generator"
 
-function* velocity(){
-  const _v=rand(-v,v);
-  while(true)yield _v();
-}
-
-function* color(){
-  const _c=rand(255);
-  while(true)yield _c();
-}
-const vf=velocity();
+const vf=velocity(v);
 const cf=color();
-class ColofulParticle{
-  constructor(width, height){
+class Particle{
+  constructor(){
+    this.initialize.apply(this,arguments);
+  }
+  initialize(width, height){
     this.vx=vf.next().value;
     this.vy=vf.next().value;
-    this.x=rand(width)();
-    this.y=rand(height)();
+    this.x=random(width)();
+    this.y=random(height)();
     this.color={
       r:cf.next().value,
       g:cf.next().value,
@@ -38,15 +27,29 @@ class ColofulParticle{
   
   update(width, height){
       this.x+=this.vx;
-      this.x=(this.x+width)%width;
       this.y+=this.vy;
-      this.y=(this.y+height)%height;
+      if(this.x>width||this.x<0){
+        this.flow("x",width);
+      };
+      if(this.y>height||this.y<0){
+        this.flow("y", height);
+      }
+  }
+  flow(type, range){
+    switch (type) {
+      case "x":
+        this.x=(this.x+range)%range;
+        break;
+      default:
+        this.y=(this.y+range)%range;
+        break;
+    }
   }
   updateVelocity(){
     this.vx=vf.next().value;
     this.vy=vf.next().value;
   }
-  force(x, y){
+  reflect(x, y){
     const vx=this.vx;
     const vy=this.vy;
 
@@ -61,4 +64,4 @@ class ColofulParticle{
     this.vy=-(vx*sin+vy*cos);
   }
 }
-export default ColofulParticle;
+export default Particle;
