@@ -49,6 +49,9 @@ class Particle{
     this.vx=vf.next().value;
     this.vy=vf.next().value;
   }
+  /**
+   * not used
+   */
   reflect(x, y){
     const vx=this.vx;
     const vy=this.vy;

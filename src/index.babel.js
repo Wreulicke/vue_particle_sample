@@ -13,25 +13,16 @@ document.addEventListener('DOMContentLoaded',() =>{
   const App=Vue.extend({
     created:function() {
       const n=300;
-      for (var i = 0; i < n; i++)this.particles.push(new Particle(this.width, this.height));
+      for (var i = 0; i < n; i++){
+        let particle=new Particle(this.width,this.height);
+        this.particles.push(particle);
+      }
     },
     ready:function() {
       setTimeout(this.tick,200);
     },
     methods:{
       calc:function(particle){
-        /**
-         * このへんイラネ
-         */
-        if(this.cursor.enable){
-          const inRange=Math.hypot(particle.x-this.cursor.x,particle.y-this.cursor.y) < this.cursor.r;
-          if(!particle.controlled){
-            if(inRange){
-              particle.reflect(this.cursor.x, this.cursor.y);
-              particle.controlled=true;
-            }
-          }else if(!inRange)particle.controlled=false;
-        }
         particle.update(this.width, this.height);
         if(particle.state==="death"){
           this.particles.$remove(particle);
@@ -66,11 +57,6 @@ document.addEventListener('DOMContentLoaded',() =>{
       updateVelocity:function () {
         this.particles.forEach(this.calcVelocity,this);
       },
-      updateCursor:function(e){
-        this.cursor.x=e.offsetX;
-        this.cursor.y=e.offsetY;
-        if(!this.cursor.enable)this.cursor.enable=true;
-      },
       onKeydown: function (e) {
         console.log(e.keyIdentifier);
         this.keyState=e.keyIdentifier;
@@ -78,12 +64,6 @@ document.addEventListener('DOMContentLoaded',() =>{
     },
     data:() => {
       return {
-        cursor:{
-          x:0,
-          y:0,
-          r:0,
-          enable:false
-        },
         player:{
           x:400,
           y:500,
