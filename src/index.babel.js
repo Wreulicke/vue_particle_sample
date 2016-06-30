@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded',() =>{
       }
     }
   });
-  window.e=new App({el:document.body});
+  new App({el:document.body});
 })
 
   

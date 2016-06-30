@@ -16,6 +16,7 @@
         xmlns:xlink="http://www.w3.org/1999/xlink">
         <circle v-for="p in particles" :cx="p.x" :cy="p.y" r="5" :fill="p.toColor()" />
         <circle :cx="player.x" :cy="player.y" :r="player.r" />
+        
       </svg>
     </div>
     <mdl-button v-mdl-ripple-effect v-on:click="updateVelocity()">test</mdl-button>
